@@ -34,7 +34,7 @@ export const TestPage: React.FC = () => {
   const [questions, setQuestions] = useState<any[]>([]);
   const [code, setCode] = useState<string>(`def main(input):\n  #code here`);
   const [output, setOutput] = useState('');
-
+  const [assess,setassessed]=useState('')
   // Fetching questions on initial load or dependency change
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -72,6 +72,31 @@ export const TestPage: React.FC = () => {
   }, [questionCount, difficulty, topic]);
 
   const currentQuestion = questions[currentQuestionIndex];
+
+  const analysefunction = async () => {
+    const requestData = {
+      script: code,
+      currentQuestion: currentQuestion
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/analysescore', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      }).then((res)=>{
+        return res.json();
+      });
+      const output = response.replace(/^```|```$/g, "");
+      
+      setassessed(output);
+      // Update state with fetched questions
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    }
+  };
 
   const handleRunCode = async () => {
     try {
@@ -136,6 +161,8 @@ export const TestPage: React.FC = () => {
           onChange={setCode}
           onRun={handleRunCode}
           output={output}
+          clickanalyse={analysefunction}
+          assessed={assess}
         />
 
         <div className="flex justify-between items-center">

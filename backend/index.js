@@ -94,6 +94,33 @@ app.post('/generate-mock-questions', async (req, res) => {
   });
 
 // analyse code and response api through gemini api
+app.post('/analysescore', async (req, res) => {
+  const {script,currentQuestion} = req.body;
+  const prompt = `
+    Analyse the ${script} written by the student with the ${currentQuestion}, and give score out of 100 
+    
+    Example output string:
+        timecomplexity: the time complexity if around O(n) you can do in better way with this method(tell some optimized hint here),
+        hint: (give some hint)
+        score: 52 (out of 100)
+    
+    output should be plain string
+      
+  `;
+
+  try {
+    // Generate content using the Gemini model
+    const result = await model.generateContent(prompt);
+
+    // Send the generated questions back to the client
+    res.json(result.response.text());
+    console.log(result.response.text())
+  } catch (error) {
+    console.error("Failed to fetch mock questions:", error);
+    res.status(500).json({ error: "Failed to generate questions", message: error.message });
+  }
+});
+
 app.listen(3000, () => {
     console.log("Server Running on port 3000");
 });
