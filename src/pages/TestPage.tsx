@@ -77,7 +77,7 @@ export const TestPage: React.FC = () => {
     try {
         const requestData = { script: code }; // Pass the code string from user input
         
-        const response = await fetch("http://localhost:3000/generate-mock-questions", {
+        const response = await fetch("http://localhost:3000/api/runcode", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
