@@ -42,3 +42,6 @@ app.get('/api/runcode', async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
+app.listen(3000,()=>
+{console.log("Server Running on port 3000")})
