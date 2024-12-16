@@ -53,41 +53,32 @@ int main(){
   
 
   const handleRunCode = async () => {
-    // write all the below logic in express and integrate
     try {
-  const requestData = {
-    clientId: "98f3dea44343f343f4b8bcfa2dafd63a",
-    clientSecret: "9f10f70ac88318b617258bfde56a1f2e58ec20dec9f96e2b6bc3546eebf9ece8",
-    script: code, // Replace with your Python code string
-    language: "python",
-    versionIndex: "3", // Ensure you use the correct version index for Python
-    compileOnly: false,
-  };
+        const requestData = { script: code }; // Pass the code string from user input
+        
+        const response = await fetch("http://localhost:3000/api/runcode", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+        });
 
-  const response = await fetch("https://api.jdoodle.com/v1/execute", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(requestData),
-  });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "An error occurred");
+        }
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const data = await response.json(); // Correctly parse the JSON response
-  console.log("Execution Response:", data);
-
-  // Check if execution was successful
-  if (data.output) {
-    console.log("Output:", data.output);
-  } else {
-    console.error("Error/Exception:", data.error || data.exception);
-  }
-} catch (error) {
-  console.error("Error while executing code:", error);
-}
+        const data = await response.json();
+        if (data.success) {
+            setOutput(data.output); // Update the state with the output
+        } else {
+            setOutput(`Error: ${data.error}`); // Display error
+        }
+    } catch (err) {
+        console.error("Error in handleRunCode:", err.message);
+        setOutput(`Error: ${err.message}`);
+    }
 
   };
 

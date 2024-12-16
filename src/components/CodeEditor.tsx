@@ -19,7 +19,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     <div className="flex flex-col gap-4">
       <div className="bg-white rounded-lg shadow-md">
         <div className="border-b p-4 flex justify-between items-center">
-          <h3 className="font-semibold">C++ Code Editor</h3>
+          <h3 className="font-semibold">Python Code Editor</h3>
           <button
             onClick={onRun}
             className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
@@ -30,7 +30,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         </div>
         <Editor
           height="400px"
-          language="cpp"  // Set language to C++
+          language="python" // Set language to Python
           value={code}
           onChange={(value) => onChange(value || '')}
           theme="vs-dark"
@@ -39,7 +39,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             fontSize: 14,
             lineNumbers: 'on',
             autoClosingBrackets: 'always',
-            autoIndent: true,
+            autoIndent: 'full',
           }}
         />
       </div>
