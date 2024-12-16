@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors'); // Import cors
-
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const app = express();
 
 // Enable CORS for all routes
@@ -22,7 +22,6 @@ app.post('/api/runcode', async (req, res) => {
         language: "python3", // Default to Python
         compileOnly: false,
     };
-
     try {
         const response = await fetch("https://api.jdoodle.com/v1/execute", {
             method: "POST",
@@ -47,6 +46,54 @@ app.post('/api/runcode', async (req, res) => {
     }
 });
 
+
+const genAI = new GoogleGenerativeAI("AIzaSyCetzSyoBZkU-SasQ4YQdV9br0jGUpnoBM"); // Replace with your actual API key
+
+// Set up the model configuration
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }, { apiVersion: 'v1' });
+
+app.post('/generate-mock-questions', async (req, res) => {
+    const {number, difficulty,category} = req.body;
+    const prompt = `
+      Generate a list of mock coding questions in JSON format string form. Each question should have:
+      - id: unique integer
+      - title: string (name of the problem)
+      - description: string (detailed problem statement)
+      - difficulty: string (Easy, Medium, Hard)
+      - category: string (e.g., Arrays, Strings, Graphs)
+      - testCases: array of strings (example inputs)
+      - expectedOutputs: array of strings (expected outputs for the test cases)
+      
+      Example:
+      [
+        {
+          id: 1,
+          title: "Two Sum",
+          description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
+          difficulty: "Easy",
+          category: "Arrays",
+          testCases: ["[2,7,11,15], target = 9"],
+          expectedOutputs: ["[0,1]"]
+        }
+      ]
+      
+      Generate ${number} such questions with ${difficulty} difficulty and ${category} category.
+    `;
+  
+    try {
+      // Generate content using the Gemini model
+      const result = await model.generateContent(prompt);
+  
+      // Send the generated questions back to the client
+      res.json(result.response.text());
+      console.log(result.response.text())
+    } catch (error) {
+      console.error("Failed to fetch mock questions:", error);
+      res.status(500).json({ error: "Failed to generate questions", message: error.message });
+    }
+  });
+
+// analyse code and response api through gemini api
 app.listen(3000, () => {
     console.log("Server Running on port 3000");
 });
