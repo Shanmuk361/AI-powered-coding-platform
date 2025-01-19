@@ -27,8 +27,18 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const TestPage: React.FC = () => {
   const location = useLocation();
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
   const { topic, difficulty, questionCount } = location.state || {};
+
+  // State to indicate redirection
+  // const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (!topic) {
+      // setIsRedirecting(true);
+      navigate('/'); // Redirect to root
+    }
+  }, [topic, navigate]);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questions, setQuestions] = useState<any[]>([]);

@@ -1,9 +1,11 @@
 const express = require('express');
-const cors = require('cors'); // Import cors
+const cors = require('cors'); 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const app = express();
+require('dotenv').config();
 
-// Enable CORS for all routes
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY);
+
 app.use(cors());
 
 app.use(express.json());
@@ -45,9 +47,6 @@ app.post('/api/runcode', async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
-
-
-const genAI = new GoogleGenerativeAI("AIzaSyCetzSyoBZkU-SasQ4YQdV9br0jGUpnoBM"); // Replace with your actual API key
 
 // Set up the model configuration
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }, { apiVersion: 'v1' });
