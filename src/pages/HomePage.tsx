@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { TopicSelector } from '../components/TopicSelector';
 import { LeaderBoard } from '../components/LeaderBoard';
 import { Brain } from 'lucide-react';
-import NameInputComponent from '../components/NameInputComponent';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();

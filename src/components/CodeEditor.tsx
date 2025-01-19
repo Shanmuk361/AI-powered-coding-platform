@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Editor from '@monaco-editor/react';
 import { Play } from 'lucide-react';
 
@@ -42,7 +42,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         <br />
         <Editor
           height="400px"
-          language="python" // Set language to Python
+          language="python" 
           value={code}
           onChange={(value) => onChange(value || '')}
           theme="vs-dark"
@@ -59,11 +59,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             onClick={clickanalyse}
               className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
                 <Play className="w-4 h-4" />
-                    Analyse by AI
+                    Get Hint
           </button>
         </div>
       </div>
-      <div className="bg-gray-900 text-white p-4 rounded-lg">
+      <div className="bg-gray-300 text-white p-4 rounded-lg">
          <pre 
             className="font-mono text-sm overflow-x-auto whitespace-pre-wrap break-words"
               >
