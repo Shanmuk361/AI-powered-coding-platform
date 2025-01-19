@@ -34,7 +34,7 @@ export const TestPage: React.FC = () => {
   const [questions, setQuestions] = useState<any[]>([]);
   const [code, setCode] = useState<string>(`def main(input):\n  #code here`);
   const [output, setOutput] = useState('');
-  const [assess,setassessed]=useState('')
+  const [assess,setassessed]=useState('');
   // Fetching questions on initial load or dependency change
   useEffect(() => {
     const fetchQuestions = async () => {

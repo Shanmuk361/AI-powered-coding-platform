@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TopicSelector } from '../components/TopicSelector';
 import { LeaderBoard } from '../components/LeaderBoard';
 import { Brain } from 'lucide-react';
-
+import NameInputComponent from '../components/NameInputComponent';
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedTopic, setSelectedTopic] = useState('');
@@ -21,6 +21,12 @@ export const HomePage: React.FC = () => {
   };
 
   return (
+    <>
+    <div>
+    <NameInputComponent>
+    </NameInputComponent>
+
+    </div>
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
@@ -93,5 +99,6 @@ export const HomePage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
