@@ -3,6 +3,8 @@ const cors = require('cors');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const app = express();
 const mongoose = require('mongoose');
+const User = require('./models/Users'); 
+
 require('dotenv').config();
 
 mongoose
@@ -15,6 +17,39 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY);
 app.use(cors());
 
 app.use(express.json());
+
+app.get('/api/top-users', async (req, res) => {
+  try {
+    const topUsers = await User.find()
+      .sort({ score: -1 }) // Sort by score in descending order
+      .limit(5); // Limit to first 5 users
+
+    res.json(topUsers); // Return the users as JSON response
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching top users', error: error.message });
+  }
+});
+
+app.post('/add-user', async (req, res) => {
+  const { name } = req.body;
+  let { score } =req.body;
+  // Check if name is provided
+  if (score === undefined) {
+    score = 0;
+  }
+  if (!name) {
+    return res.status(400).json({ message: 'Name is required' });
+  }
+
+  try {
+    const newUser = new User({ name ,score });
+    await newUser.save();
+    res.status(201).json({ message: 'User added successfully', user: newUser });
+  } catch (err) {
+    console.error('Error adding user:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 app.post('/api/runcode', async (req, res) => {
     const { script } = req.body;

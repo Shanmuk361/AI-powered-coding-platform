@@ -7,7 +7,7 @@ export const TestPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { topic, difficulty, questionCount } = location.state || {};
-
+  
   useEffect(() => {
     if (!topic) {
       navigate('/'); 
@@ -156,7 +156,6 @@ export const TestPage: React.FC = () => {
           >
             Submit
           </button>
-          
         </div>
       </div>
     </div>
