@@ -188,6 +188,114 @@ app.post('/analysescore', async (req, res) => {
   }
 });
 
+// analyse code and response api through gemini api
+app.post('/updateaiscore', async (req, res) => {
+  const { difficulty, name, script, currentQuestion } = req.body;
+
+  // Validate request body
+  if (!name || !script || !currentQuestion) {
+    return res.status(400).json({
+      error: 'Missing required fields',
+      message: 'Name, script, and currentQuestion are required'
+    });
+  }
+
+  const prompt = `
+Evaluate the following code solution and return a JSON response with scores and feedback.
+
+STUDENT CODE:
+${script}
+
+PROBLEM:
+${currentQuestion}
+
+Evaluate the solution based on these criteria and return a JSON object with the following structure:
+{
+  "overallScore": number (0-100)
+}
+
+Scoring criteria:
+- Based on ${difficulty}
+- Absolute zero score if code is incomplete or doesn't return an expected answer
+- Correctness (25pts): Does it produce the expected output?
+- Efficiency (25pts): How optimal is the time/space complexity?
+- Code Quality (25pts): Is the code clean, readable, and well-structured?
+- Problem Solving (25pts): Does it demonstrate good problem-solving approach?
+
+Return ONLY the JSON object with no additional text or explanation.`;
+
+  try {
+    // Generate AI score
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
+    
+    // Parse the response and extract score
+    let score;
+    try {
+      const jsonResponse = JSON.parse(response);
+      score = jsonResponse.overallScore;
+    } catch (parseError) {
+      // Attempt regex extraction if JSON parse fails
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const extractedJson = JSON.parse(jsonMatch[0]);
+        score = extractedJson.overallScore;
+      } else {
+        throw new Error('Failed to parse score from AI response');
+      }
+    }
+
+    // Validate score
+    if (typeof score !== 'number' || score < 0 || score > 100) {
+      throw new Error('Invalid score value received from AI');
+    }
+
+    try {
+      // Try to find existing user
+      let user = await User.findOne({ name });
+
+      if (user) {
+        // Update existing user's score
+        user.score += score;
+        await user.save();
+      } else {
+        // Create new user if doesn't exist
+        user = new User({
+          name,
+          score
+        });
+        await user.save();
+      }
+
+      // Return updated user data
+      res.json({
+        success: true,
+        user: {
+          name: user.name,
+          score: user.score,
+          createdAt: user.createdAt
+        },
+        addedScore: score
+      });
+
+    } catch (dbError) {
+      console.error('Database operation failed:', dbError);
+      res.status(500).json({
+        error: 'Database operation failed',
+        message: dbError.message
+      });
+    }
+
+  } catch (error) {
+    console.error('Score generation failed:', error);
+    res.status(500).json({
+      error: 'Score generation failed',
+      message: error.message
+    });
+  }
+});
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server Running on port ${PORT}`);

@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CodeEditor } from '../components/CodeEditor';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-
+import {  ChevronRight } from 'lucide-react';
+// ChevronLeft,
 export const TestPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { topic, difficulty, questionCount } = location.state || {};
-  
+  const { name, topic, difficulty, questionCount } = location.state || {};
+
+  const endHandle = () => {
+    // Navigate to the root page
+    navigate('/');
+  };
   useEffect(() => {
     if (!topic) {
       navigate('/'); 
@@ -85,6 +89,25 @@ export const TestPage: React.FC = () => {
     }
   };
 
+  const handlesubmit = async () => {
+    const requestData = { difficulty, name, script: code, currentQuestion };
+    try {
+      const response = await fetch('http://localhost:3000/updateaiscore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
+      const output = await response.json();
+      console.log(output);
+    } catch (error) {
+      console.error('Error analyzing code:', error);
+    }
+    
+    setCode(`class Solution:\n  def main(input):\n    #code here`);
+    setAssess('');
+    setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -148,22 +171,18 @@ export const TestPage: React.FC = () => {
           </button> */}
 
           <button
-            onClick={() => {
-              setCode(`class Solution:\n  def main(input):\n    #code here`);
-              setAssess('');
-              setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}}
-            disabled={currentQuestionIndex === questions.length - 1}
+            onClick={handlesubmit}
+            disabled={currentQuestionIndex === questions.length}
             className="flex items-center gap-2 px-4 py-2 bg-white rounded-md shadow-sm disabled:opacity-50"
           >
-            Submit and Next
-            <ChevronRight className="w-4 h-4" />
+            Submit and Next <ChevronRight className="w-4 h-4" />
           </button>
           <div className="flex-grow"></div>
           <button
-            onClick={handleRunCode}
+            onClick={endHandle}
             className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md shadow-sm"
           >
-            END
+            END TEST
           </button>
         </div>
       </div>
