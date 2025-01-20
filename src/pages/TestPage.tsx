@@ -16,7 +16,7 @@ export const TestPage: React.FC = () => {
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questions, setQuestions] = useState<any[]>([]);
-  const [code, setCode] = useState<string>(`def main(input):\n  #code here`);
+  const [code, setCode] = useState<string>(`class Solution:\n  def main(input):\n    #code here`);
   const [output, setOutput] = useState('');
   const [assess, setAssess] = useState('');
 
@@ -115,6 +115,10 @@ export const TestPage: React.FC = () => {
               <h3 className="font-medium mb-2">Test Cases:</h3>
               <pre className="text-sm">{currentQuestion.testCases.join('\n')}</pre>
             </div>
+            <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <h3 className="font-medium mb-2">Expected Outputs:</h3>
+              <pre className="text-sm">{currentQuestion.expectedOutputs.join('\n')}</pre>
+            </div>
           </div>
         ) : (
           <p>Loading questions...</p>
@@ -132,29 +136,34 @@ export const TestPage: React.FC = () => {
 
         {/* Navigation Buttons */}
         <div className="flex gap-4">
-          <button
-            onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+          {/* <button
+            onClick={() => {
+              setCode(`class Solution:\n  def main(input):\n    #code here`);
+              setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}}
             disabled={currentQuestionIndex === 0}
             className="flex items-center gap-2 px-4 py-2 bg-white rounded-md shadow-sm disabled:opacity-50"
           >
             <ChevronLeft className="w-4 h-4" />
             Previous
-          </button>
+          </button> */}
 
           <button
-            onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+            onClick={() => {
+              setCode(`class Solution:\n  def main(input):\n    #code here`);
+              setAssess('');
+              setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}}
             disabled={currentQuestionIndex === questions.length - 1}
             className="flex items-center gap-2 px-4 py-2 bg-white rounded-md shadow-sm disabled:opacity-50"
           >
-            Next
+            Submit and Next
             <ChevronRight className="w-4 h-4" />
           </button>
           <div className="flex-grow"></div>
           <button
             onClick={handleRunCode}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md shadow-sm"
           >
-            Submit
+            END
           </button>
         </div>
       </div>

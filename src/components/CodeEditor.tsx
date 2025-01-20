@@ -63,7 +63,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           </button>
         </div>
       </div>
-      <div className="bg-gray-300 text-white p-4 rounded-lg">
+      <div className="bg-black text-white p-4 rounded-lg">
          <pre 
             className="font-mono text-sm overflow-x-auto whitespace-pre-wrap break-words"
               >

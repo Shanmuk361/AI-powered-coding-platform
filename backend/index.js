@@ -21,10 +21,10 @@ app.use(express.json());
 app.get('/api/top-users', async (req, res) => {
   try {
     const topUsers = await User.find()
-      .sort({ score: -1 }) // Sort by score in descending order
-      .limit(5); // Limit to first 5 users
+      .sort({ score: -1 })
+      .limit(5); 
 
-    res.json(topUsers); // Return the users as JSON response
+    res.json(topUsers);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching top users', error: error.message });
   }
@@ -61,8 +61,8 @@ app.post('/api/runcode', async (req, res) => {
     const requestData = {
         clientId: "98f3dea44343f343f4b8bcfa2dafd63a",
         clientSecret: "9f10f70ac88318b617258bfde56a1f2e58ec20dec9f96e2b6bc3546eebf9ece8",
-        script, // Pass the user's code from the request
-        language: "python3", // Default to Python
+        script,
+        language: "python3",
         compileOnly: false,
     };
     try {
@@ -121,12 +121,23 @@ app.post('/generate-mock-questions', async (req, res) => {
     `;
   
     try {
-      // Generate content using the Gemini model
       const result = await model.generateContent(prompt);
-  
+      const jsonText = result.response.candidates[0].content.parts[0].text;
+        
+        // Remove the markdown code block markers and parse JSON
+        const cleanJson = jsonText.replace(/```json\n|\n```/g, '');
+        const questions = JSON.parse(cleanJson);
+        
+        // Send the parsed questions array
+        res.send(questions);
+        console.log(jsonText);
+
+      
       // Send the generated questions back to the client
-      res.json(result.response.text());
-      console.log(result.response.text())
+      // res.send(result);
+      // console.log(result);
+      // res.json(result.response.text());
+      // console.log(result.response.text())
     } catch (error) {
       console.error("Failed to fetch mock questions:", error);
       res.status(500).json({ error: "Failed to generate questions", message: error.message });
@@ -137,17 +148,33 @@ app.post('/generate-mock-questions', async (req, res) => {
 app.post('/analysescore', async (req, res) => {
   const {script,currentQuestion} = req.body;
   const prompt = `
-    Analyse the ${script} written by the student with the ${currentQuestion}, and give score out of 100 
-    
-    Example output string:
-        timecomplexity: the time complexity if around O(n) you can do in better way with this method(tell some optimized hint here),
-        hint: (give some hint)
-        score: 52 (out of 100)
-    
-    output should be plain string
-      
-  `;
+  Analyze this programming solution:
+  STUDENT CODE:
+  ${script}
 
+  PROBLEM:
+  Title: ${currentQuestion.title}
+  Description: ${currentQuestion.description}
+  Expected Output: ${currentQuestion.expectedOutputs.join('\n')}
+
+  Provide a concise analysis in this exact format:
+  Analysis: Evaluate the solution's correctness, implementation quality, and potential issues.
+  timecomplexity: State the current time complexity using Big O notation. If suboptimal, specify a better approach.
+  hint: Provide one specific, actionable improvement suggestion.
+
+  Rules for analysis:
+  - Keep feedback constructive and specific
+  - Focus on algorithmic efficiency and code quality
+  - If optimal solution exists, mention it briefly
+  - Highlight both strengths and areas for improvement
+  - Suggest practical optimization techniques
+
+  Example response format:
+  Analysis: The solution correctly handles edge cases but uses excessive memory.
+  timecomplexity: Current O(n²) can be optimized to O(n log n) using heap.
+  hint: Consider using a min-heap to reduce sorting overhead`;
+
+  
   try {
     // Generate content using the Gemini model
     const result = await model.generateContent(prompt);
