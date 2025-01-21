@@ -232,12 +232,12 @@ ${currentQuestion}
 
 Evaluate the solution based on these criteria and return a JSON object with the following structure:
 {
-  "overallScore": number (0-100)
+  "overallScore": number (-50-100)
 }
 
 Scoring criteria:
 - Based on ${difficulty}
-- Absolute zero score or negative if code is incomplete or doesn't return an expected answer
+- Negative Score if code is incomplete or not good doesn't return an expected answer
 - Correctness (25pts): Does it produce the expected output?
 - Efficiency (25pts): How optimal is the time/space complexity?
 - Code Quality (25pts): Is the code clean, readable, and well-structured?

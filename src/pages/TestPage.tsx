@@ -144,9 +144,9 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-gray-100">
       {/* Top Header */}
-      <div className="bg-white shadow-sm p-4 mb-6">
+      <div className="bg-white shadow-sm p-4">
         <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold text-gray-800">Coding Assessment</h1>
           <div className="bg-blue-50 px-4 py-2 rounded-lg">
@@ -155,13 +155,13 @@ useEffect(() => {
           </div>
         </div>
       </div>
-
-      {/* Split Layout Container */}
-      <div className="max-w-screen-2xl mx-auto px-4 flex gap-6">
+  
+      {/* Main Content */}
+      <div className="flex-grow flex">
         {/* Left Panel - Question Details */}
-        <div className="w-5/12 space-y-4">
+        <div className="w-5/12 h-full bg-white shadow-sm flex flex-col">
           {questions.length > 0 ? (
-            <div className="bg-white rounded-lg shadow-sm h-[calc(100vh-8rem)] overflow-y-auto">
+            <div className="h-full overflow-y-auto">
               <div className="sticky top-0 bg-white border-b p-4 z-10">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-gray-800">
@@ -181,12 +181,12 @@ useEffect(() => {
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{currentQuestion?.title}</h3>
               </div>
-
+  
               <div className="p-4 space-y-6">
                 <div>
                   <p className="text-gray-600 mb-4">{currentQuestion?.description}</p>
                 </div>
-
+  
                 <div>
                   <h4 className="font-medium text-gray-800 mb-2">Test Cases:</h4>
                   <div className="bg-gray-50 p-3 rounded-lg">
@@ -195,7 +195,7 @@ useEffect(() => {
                     </pre>
                   </div>
                 </div>
-
+  
                 <div>
                   <h4 className="font-medium text-gray-800 mb-2">Expected Outputs:</h4>
                   <div className="bg-gray-50 p-3 rounded-lg">
@@ -207,15 +207,15 @@ useEffect(() => {
               </div>
             </div>
           ) : (
-            <div className="flex justify-center items-center h-[calc(100vh-8rem)]">
+            <div className="flex justify-center items-center h-full">
               <p className="text-gray-500">Loading questions...</p>
             </div>
           )}
         </div>
-
+  
         {/* Right Panel - Code Editor */}
-        <div className="w-7/12 space-y-4">
-          <div className="bg-white rounded-lg shadow-sm h-[calc(100vh-12rem)]">
+        <div className="w-7/12 h-full bg-white shadow-sm flex flex-col">
+          <div className="flex-grow">
             <CodeEditor
               code={code}
               onChange={setCode}
@@ -225,18 +225,18 @@ useEffect(() => {
               assessed={assess}
             />
           </div>
-
+  
           {/* Action Buttons */}
-          <div className="flex justify-between items-center">
+          <div className="p-4 flex justify-between items-center border-t">
             <button
               onClick={handlesubmit}
-              disabled={currentQuestionIndex === questions.length-1}
+              disabled={currentQuestionIndex === questions.length - 1}
               className="px-6 py-2.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:hover:bg-blue-500 flex items-center gap-2"
             >
-              Submit and Next 
+              Submit and Next
               <ChevronRight className="w-4 h-4" />
             </button>
-
+  
             <button
               onClick={endHandle}
               className="px-6 py-2.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors flex items-center gap-2"
@@ -248,4 +248,4 @@ useEffect(() => {
       </div>
     </div>
   );
-};
+}  
