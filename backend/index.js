@@ -237,7 +237,7 @@ Evaluate the solution based on these criteria and return a JSON object with the 
 
 Scoring criteria:
 - Based on ${difficulty}
-- Absolute zero score if code is incomplete or doesn't return an expected answer
+- Absolute zero score or negative if code is incomplete or doesn't return an expected answer
 - Correctness (25pts): Does it produce the expected output?
 - Efficiency (25pts): How optimal is the time/space complexity?
 - Code Quality (25pts): Is the code clean, readable, and well-structured?
@@ -268,9 +268,9 @@ Return ONLY the JSON object with no additional text or explanation.`;
     }
 
     // Validate score
-    if (typeof score !== 'number' || score < 0 || score > 100) {
-      throw new Error('Invalid score value received from AI');
-    }
+    // if (typeof score !== 'number' || score < 0 || score > 100) {
+    //   throw new Error('Invalid score value received from AI');
+    // }
 
     try {
       // Try to find existing user
