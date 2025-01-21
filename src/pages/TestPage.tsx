@@ -35,6 +35,7 @@ export const TestPage: React.FC = () => {
   const [code, setCode] = useState<string>(`class Solution:\n  def main(input):\n    #code here`);
   const [output, setOutput] = useState('');
   const [assess, setAssess] = useState('');
+
   useEffect(() => {
     const fetchQuestions = async () => {
       const requestData = {
@@ -143,99 +144,106 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
-      {/* Header with Score */}
-      <div className="max-w-7xl mx-auto mb-6">
-        <div className="bg-white rounded-lg shadow-sm p-4 flex justify-between items-center">
+    <div className="min-h-screen bg-gray-100">
+      {/* Top Header */}
+      <div className="bg-white shadow-sm p-4 mb-6">
+        <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold text-gray-800">Coding Assessment</h1>
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-50 px-4 py-2 rounded-lg">
-              <span className="text-sm text-gray-600">Current Score:</span>
-              <span className="ml-2 text-xl font-bold text-blue-600">{score}</span>
-            </div>
+          <div className="bg-blue-50 px-4 py-2 rounded-lg">
+            <span className="text-sm text-gray-600">Current Score:</span>
+            <span className="ml-2 text-xl font-bold text-blue-600">{score}</span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Question Area */}
-        {questions.length > 0 ? (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="p-6 border-b">
-              <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold text-gray-800">
-                  Question {currentQuestionIndex + 1} of {questions.length}
-                </h1>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    difficulty === 'Easy'
-                      ? 'bg-green-100 text-green-800'
-                      : difficulty === 'Medium'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}
-                >
-                  {difficulty}
-                </span>
+      {/* Split Layout Container */}
+      <div className="max-w-screen-2xl mx-auto px-4 flex gap-6">
+        {/* Left Panel - Question Details */}
+        <div className="w-5/12 space-y-4">
+          {questions.length > 0 ? (
+            <div className="bg-white rounded-lg shadow-sm h-[calc(100vh-8rem)] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b p-4 z-10">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="font-bold text-gray-800">
+                    Question {currentQuestionIndex + 1} of {questions.length}
+                  </h2>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      difficulty === 'Easy'
+                        ? 'bg-green-100 text-green-800'
+                        : difficulty === 'Medium'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {difficulty}
+                  </span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{currentQuestion?.title}</h3>
               </div>
 
-              <h2 className="text-xl font-semibold mb-2">{currentQuestion.title}</h2>
-              <p className="text-gray-600 mb-4">{currentQuestion.description}</p>
-            </div>
+              <div className="p-4 space-y-6">
+                <div>
+                  <p className="text-gray-600 mb-4">{currentQuestion?.description}</p>
+                </div>
 
-            <div className="border-b">
-              <div className="p-6">
-                <h3 className="font-medium text-gray-800 mb-2">Test Cases:</h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <pre className="text-sm font-mono">{currentQuestion.testCases.join('\n')}</pre>
+                <div>
+                  <h4 className="font-medium text-gray-800 mb-2">Test Cases:</h4>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <pre className="text-sm font-mono whitespace-pre-wrap">
+                      {currentQuestion?.testCases.join('\n')}
+                    </pre>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-800 mb-2">Expected Outputs:</h4>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <pre className="text-sm font-mono whitespace-pre-wrap">
+                      {currentQuestion?.expectedOutputs.join('\n')}
+                    </pre>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <div className="border-b">
-              <div className="p-6">
-                <h3 className="font-medium text-gray-800 mb-2">Expected Outputs:</h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <pre className="text-sm font-mono">{currentQuestion.expectedOutputs.join('\n')}</pre>
-                </div>
-              </div>
+          ) : (
+            <div className="flex justify-center items-center h-[calc(100vh-8rem)]">
+              <p className="text-gray-500">Loading questions...</p>
             </div>
-          </div>
-        ) : (
-          <div className="flex justify-center items-center p-12">
-            <p className="text-gray-500">Loading questions...</p>
-          </div>
-        )}
-
-        {/* Code Editor Component */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <CodeEditor
-            code={code}
-            onChange={setCode}
-            onRun={handleRunCode}
-            output={output}
-            clickanalyse={analysefunction}
-            assessed={assess}
-          />
+          )}
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex gap-4 justify-between items-center">
-          <button
-            onClick={handlesubmit}
-            disabled={currentQuestionIndex === questions.length}
-            className="px-6 py-2.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:hover:bg-blue-500 flex items-center gap-2"
-          >
-            Submit and Next 
-            <ChevronRight className="w-4 h-4" />
-          </button>
+        {/* Right Panel - Code Editor */}
+        <div className="w-7/12 space-y-4">
+          <div className="bg-white rounded-lg shadow-sm h-[calc(100vh-12rem)]">
+            <CodeEditor
+              code={code}
+              onChange={setCode}
+              onRun={handleRunCode}
+              output={output}
+              clickanalyse={analysefunction}
+              assessed={assess}
+            />
+          </div>
 
-          <button
-            onClick={endHandle}
-            className="px-6 py-2.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors flex items-center gap-2"
-          >
-            END TEST
-          </button>
+          {/* Action Buttons */}
+          <div className="flex justify-between items-center">
+            <button
+              onClick={handlesubmit}
+              disabled={currentQuestionIndex === questions.length-1}
+              className="px-6 py-2.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:hover:bg-blue-500 flex items-center gap-2"
+            >
+              Submit and Next 
+              <ChevronRight className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={endHandle}
+              className="px-6 py-2.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors flex items-center gap-2"
+            >
+              END TEST
+            </button>
+          </div>
         </div>
       </div>
     </div>
