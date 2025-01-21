@@ -8,7 +8,19 @@ export const TestPage: React.FC = () => {
   const navigate = useNavigate();
   const { name, topic, difficulty, questionCount } = location.state || {};
 
-  const endHandle = () => {
+  const endHandle = async () => {
+    const requestData = { difficulty, name, script: code, currentQuestion };
+    try {
+      const response = await fetch('http://localhost:3000/updateaiscore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
+      const output = await response.json();
+      console.log(output);
+    } catch (error) {
+      console.error('Error analyzing code:', error);
+    }
     // Navigate to the root page
     navigate('/');
   };
@@ -23,7 +35,6 @@ export const TestPage: React.FC = () => {
   const [code, setCode] = useState<string>(`class Solution:\n  def main(input):\n    #code here`);
   const [output, setOutput] = useState('');
   const [assess, setAssess] = useState('');
-
   useEffect(() => {
     const fetchQuestions = async () => {
       const requestData = {
@@ -49,6 +60,29 @@ export const TestPage: React.FC = () => {
   }, [topic, difficulty, questionCount]);
 
   const currentQuestion = questions[currentQuestionIndex];
+  const [score, setScore] = useState(0);
+  
+  
+  
+useEffect(() => {
+  const fetchScore = async () => {
+    
+    try {
+      const response = await fetch(`http://localhost:3000/userscore/${name}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch score');
+      }
+
+      const result = await response.json();
+      setScore(result.score);
+    } catch (error) {
+      console.error('Error fetching score:', error);
+    } 
+  };
+
+  fetchScore();
+}, [currentQuestion, name]);
 
   // Analyze code function
   const analysefunction = async () => {
@@ -110,77 +144,95 @@ export const TestPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
+      {/* Header with Score */}
+      <div className="max-w-7xl mx-auto mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-gray-800">Coding Assessment</h1>
+          <div className="flex items-center gap-4">
+            <div className="bg-blue-50 px-4 py-2 rounded-lg">
+              <span className="text-sm text-gray-600">Current Score:</span>
+              <span className="ml-2 text-xl font-bold text-blue-600">{score}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Question Area */}
         {questions.length > 0 ? (
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <div className="flex justify-between items-center mb-4">
-              <h1 className="text-2xl font-bold">
-                Question {currentQuestionIndex + 1} of {questions.length}
-              </h1>
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  difficulty === 'Easy'
-                    ? 'bg-green-100 text-green-800'
-                    : difficulty === 'Medium'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-red-100 text-red-800'
-                }`}
-              >
-                {difficulty}
-              </span>
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="p-6 border-b">
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold text-gray-800">
+                  Question {currentQuestionIndex + 1} of {questions.length}
+                </h1>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    difficulty === 'Easy'
+                      ? 'bg-green-100 text-green-800'
+                      : difficulty === 'Medium'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}
+                >
+                  {difficulty}
+                </span>
+              </div>
+
+              <h2 className="text-xl font-semibold mb-2">{currentQuestion.title}</h2>
+              <p className="text-gray-600 mb-4">{currentQuestion.description}</p>
             </div>
 
-            <h2 className="text-xl font-semibold mb-2">{currentQuestion.title}</h2>
-            <p className="text-gray-600 mb-4">{currentQuestion.description}</p>
-
-            <div className="bg-gray-50 p-4 rounded-lg mb-4">
-              <h3 className="font-medium mb-2">Test Cases:</h3>
-              <pre className="text-sm">{currentQuestion.testCases.join('\n')}</pre>
+            <div className="border-b">
+              <div className="p-6">
+                <h3 className="font-medium text-gray-800 mb-2">Test Cases:</h3>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <pre className="text-sm font-mono">{currentQuestion.testCases.join('\n')}</pre>
+                </div>
+              </div>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg mb-4">
-              <h3 className="font-medium mb-2">Expected Outputs:</h3>
-              <pre className="text-sm">{currentQuestion.expectedOutputs.join('\n')}</pre>
+
+            <div className="border-b">
+              <div className="p-6">
+                <h3 className="font-medium text-gray-800 mb-2">Expected Outputs:</h3>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <pre className="text-sm font-mono">{currentQuestion.expectedOutputs.join('\n')}</pre>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
-          <p>Loading questions...</p>
+          <div className="flex justify-center items-center p-12">
+            <p className="text-gray-500">Loading questions...</p>
+          </div>
         )}
 
         {/* Code Editor Component */}
-        <CodeEditor
-          code={code}
-          onChange={setCode}
-          onRun={handleRunCode}
-          output={output}
-          clickanalyse={analysefunction}
-          assessed={assess}
-        />
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <CodeEditor
+            code={code}
+            onChange={setCode}
+            onRun={handleRunCode}
+            output={output}
+            clickanalyse={analysefunction}
+            assessed={assess}
+          />
+        </div>
 
         {/* Navigation Buttons */}
-        <div className="flex gap-4">
-          {/* <button
-            onClick={() => {
-              setCode(`class Solution:\n  def main(input):\n    #code here`);
-              setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}}
-            disabled={currentQuestionIndex === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-white rounded-md shadow-sm disabled:opacity-50"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Previous
-          </button> */}
-
+        <div className="flex gap-4 justify-between items-center">
           <button
             onClick={handlesubmit}
             disabled={currentQuestionIndex === questions.length}
-            className="flex items-center gap-2 px-4 py-2 bg-white rounded-md shadow-sm disabled:opacity-50"
+            className="px-6 py-2.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:hover:bg-blue-500 flex items-center gap-2"
           >
-            Submit and Next <ChevronRight className="w-4 h-4" />
+            Submit and Next 
+            <ChevronRight className="w-4 h-4" />
           </button>
-          <div className="flex-grow"></div>
+
           <button
             onClick={endHandle}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md shadow-sm"
+            className="px-6 py-2.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors flex items-center gap-2"
           >
             END TEST
           </button>

@@ -51,6 +51,27 @@ app.post('/add-user', async (req, res) => {
   }
 });
 
+app.get('/userscore/:name', async (req, res) => {
+  try {
+    const user = await User.findOne({ name: req.params.name });
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: 'No user found with the provided name'
+      });
+    }
+    res.json({
+      name: user.name,
+      score: user.score
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to fetch user score',
+      message: error.message
+    });
+  }
+});
+
 app.post('/api/runcode', async (req, res) => {
     const { script } = req.body;
 
@@ -188,7 +209,7 @@ app.post('/analysescore', async (req, res) => {
   }
 });
 
-// analyse code and response api through gemini api
+
 app.post('/updateaiscore', async (req, res) => {
   const { difficulty, name, script, currentQuestion } = req.body;
 
@@ -227,6 +248,7 @@ Return ONLY the JSON object with no additional text or explanation.`;
   try {
     // Generate AI score
     const result = await model.generateContent(prompt);
+    console.log(result);
     const response = result.response.text();
     
     // Parse the response and extract score
